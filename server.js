@@ -17,7 +17,8 @@ app.listen(portNr, () => {
 //Get Request som returnerar Hello World
 app.get("/", (req, res) => {
     console.log("Mottagit ett anropp");
-    res.send("Hello World, this is a response");
+    //res.send("Hello World, this is a response");
+    res.sendFile("index.html", {root: __dirname});
 });
 
 //Get endpoint som returnerar en HTML vy
@@ -56,4 +57,45 @@ app.get("/users", (req, res) => {
     } else {
         res.send("Filen finns inte");
     }
+})
+
+app.post("/login", (req, res) => {
+    const userDataPath = "./user.json";
+
+    //Hämta payload data
+    const loginUser = req.body;
+
+    if (fs.existsSync(userDataPath)) {
+        fs.readFile(userDataPath, "utf8", (err, users) => {
+            //Kontrollerar om error finns
+            if (err) {
+                console.log(err);
+                res.send("Något har gått fel");
+            }
+
+            users = JSON.parse(users);
+            console.log(loginUser);
+
+            users.forEach( (user) => {
+                //Kontrollera om username matchar, samt även password
+                if (user.username == loginUser.username) {
+                    //Kontrollera lösenordet
+                    if (user.password == loginUser.password) {
+                        //Hittat en match. Login lyckas.
+                        return res.sendFile("profile.html", {root: __dirname});
+                        
+                    }
+                    //Returnera Fail om fel lösenord
+                    return res.sendFile("failed.html", {root: __dirname});
+                }
+            })
+        
+            //Returnera fail om ingen user hittades
+            return res.sendFile("failed.html", {root: __dirname});
+
+        })
+    } else {
+        res.send("Filen finns inte");
+    }
+
 })
