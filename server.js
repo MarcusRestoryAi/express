@@ -59,6 +59,7 @@ app.get("/users", (req, res) => {
     }
 })
 
+//Endpoint för inloggning
 app.post("/login", (req, res) => {
     const userDataPath = "./user.json";
 
@@ -74,28 +75,92 @@ app.post("/login", (req, res) => {
             }
 
             users = JSON.parse(users);
-            console.log(loginUser);
+            //console.log(loginUser);
 
+            let userFound = false;
             users.forEach( (user) => {
+                //console.log(user);
                 //Kontrollera om username matchar, samt även password
-                if (user.username == loginUser.username) {
+                if (user.username === loginUser.username) {
+                    userFound = true;
                     //Kontrollera lösenordet
-                    if (user.password == loginUser.password) {
+                    if (user.password === loginUser.password) {
                         //Hittat en match. Login lyckas.
-                        return res.sendFile("profile.html", {root: __dirname});
-                        
+                         res.sendFile("profile.html", {root: __dirname});
                     }
                     //Returnera Fail om fel lösenord
-                    return res.sendFile("failed.html", {root: __dirname});
+                     else res.sendFile("failed.html", {root: __dirname});
                 }
             })
         
             //Returnera fail om ingen user hittades
-            return res.sendFile("failed.html", {root: __dirname});
+               if (userFound == false) res.sendFile("failed.html", {root: __dirname});
+            // if (!userFound)         res.sendFile("failed.html", {root: __dirname});
 
         })
     } else {
         res.send("Filen finns inte");
     }
 
+})
+
+//Endpoint för att komma till registrerings sidan
+app.get("/register", (req, res) => {
+    res.sendFile("register.html", {root: __dirname} );
+})
+
+//Endpoint för att registrera ny user
+app.post("/register", (req, res) => {
+    //Sökväg till user.json
+    const userDataPath = "./user.json";
+
+    //Hämta payload data
+    const newUser = req.body;
+
+    fs.readFile(userDataPath, "utf8", (err, users) => {
+        //TODO: Kontrollera err om något har gått fel
+
+        //Konvertera users från string till Array
+        users = JSON.parse(users);
+
+        //Lägger till ny user till listan
+        users.push(newUser);
+
+        //Spara tillbaka till user.json fil
+        fs.writeFile(userDataPath, JSON.stringify(users, null, 2), (err) => {
+            console.log("NewUserSaved");
+        });
+    });
+
+    res.redirect("/");
+})
+
+//Endpoint för att ta boty user
+app.post("/register/remove", (req, res) => {
+    //Sökväg till user.json
+    const userDataPath = "./user.json";
+
+    //Hämta payload data
+    const userToRemove = req.body;
+
+    fs.readFile(userDataPath, "utf8", (err, users) => {
+        //TODO: Kontrollera err om något har gått fel
+
+        //Konvertera users från string till Array
+        users = JSON.parse(users);
+
+        users.forEach((user, i, arr) => {
+            //Kontrollerar om user är den som skall tas bort
+            if (user.username == userToRemove.username) {
+                arr.splice(i, 1);
+            }
+        })
+
+        //Spara tillbaka till user.json fil
+        fs.writeFile(userDataPath, JSON.stringify(users, null, 2), (err) => {
+            console.log("NewUserSaved");
+        });
+    });
+
+    res.redirect("/");
 })

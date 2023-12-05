@@ -1,14 +1,22 @@
 [
-    {
-        "username":"marcus",
-        "password":"qwerty"
-    },
-    {
-        "username":"niklas",
-        "password":"green"
-    },
-    {
-        "username":"belman",
-        "password":"luta"
-    }
+  {
+    "username": "marcus",
+    "password": "qwerty"
+  },
+  {
+    "username": "niklas",
+    "password": "green"
+  },
+  {
+    "username": "belman",
+    "password": "luta"
+  },
+  {
+    "username": "anders",
+    "password": "katt"
+  },
+  {
+    "username": "abc",
+    "password": "def"
+  }
 ]
